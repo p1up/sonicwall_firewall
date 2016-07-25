@@ -1,0 +1,16 @@
+{
+    "app_config": null,
+    "asset_id": "22",
+    "config": {
+        "firewall_mgmt": "10.6.1.240",
+		"admin_account": "admin",
+		"admin_password": "password"
+    },
+    "debug_level": 3,
+    "identifier": "block_ip",
+    "parameters": [
+        {
+            "target": "10.6.45.123"
+        }
+    ]
+}
