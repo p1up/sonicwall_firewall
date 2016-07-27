@@ -7,29 +7,36 @@
     "type": "firewall",
     "license": "Copyright (c) SonicWALL Corporation 2016",
     "main_module" : "soniccli_connector.pyc",
-    "app_version": "1.2.9",
-    "utctime_updated": "2016-04-28T22:20:36.000000Z",
+    "app_version": "1.3.0",
+    "utctime_updated": "2016-07-27T22:20:36.000000Z",
     "product_vendor": "SonicWALL",
     "product_name": "SonicWALL Firewall",
     "product_version_regex": ".*",
-    "min_phantom_version": "1.0.240",
+    "min_phantom_version": "1.2.265",
     "logo": "soniccli.png",
-    "configuration": {
-          "firewall_mgmt": {
-            "description": "Management IP/Hostname of Sonicwall Firewall",
-            "data_type": "string",
-            "required": true
-          },
-          "admin_account": {
-            "description": "Administrator's username",
-            "data_type": "string",
-            "required": true
-          },
-          "admin_password": {
-            "description": "Administrator's password",
-            "data_type": "password",
-            "required": true
-          }
+	"configuration": {
+		"firewall_mgmt": {
+			"order": 0,
+			"description": "Management IP/Hostname of Sonicwall Firewall",
+			"data_type": "string",
+			"required": true
+		},
+		"ph": {
+			"data_type": "ph",
+			"order": 1
+		},
+		"admin_account": {
+			"order": 2,
+			"description": "Administrator's username",
+			"data_type": "string",
+			"required": true
+		},
+		"admin_password": {
+			"order": 3,
+			"description": "Administrator's password",
+			"data_type": "password",
+			"required": true
+		}
 	  },
     "actions": [
       {
@@ -52,7 +59,7 @@
 			"target": {
 				"description": "IP address to block",
 				"data_type": "string",
-				"contains": [],
+				"contains": [ "ip" ],
 				"primary": true,
 				"required": true
 			}
@@ -66,7 +73,8 @@
         "output": [
           {
             "data_path": "action_result.data.*.operate_address.*.",
-            "data_type": "string"
+            "data_type": "string",
+			"contains" : [ "ip" ]
           },
           {
             "data_path": "action_result.summary.firewall",
@@ -89,7 +97,7 @@
 			"target": {
 				"description": "IP address to unblock",
 				"data_type": "string",
-				"contains": [],
+				"contains": [ "ip" ],
 				"primary": true,
 				"required": true
 			}
@@ -103,7 +111,8 @@
         "output": [
           {
             "data_path": "action_result.data.*.operate_address.*.",
-            "data_type": "string"
+            "data_type": "string",
+			"contains" : [ "ip" ]			
           },
           {
             "data_path": "action_result.summary.firewall",
@@ -126,7 +135,7 @@
 			"target": {
 				"description": "URL to be blocked",
 				"data_type": "string",
-				"contains": [],
+				"contains": [ "url" ],
 				"primary": true,
 				"required": true
 			}
@@ -140,7 +149,8 @@
         "output": [
           {
             "data_path": "action_result.data.*.operate_address.*.",
-            "data_type": "string"
+            "data_type": "string",
+			"contains": [ "url" ]
           },
           {
             "data_path": "action_result.summary.firewall",
@@ -163,7 +173,7 @@
 			"target": {
 				"description": "URL to be unblocked",
 				"data_type": "string",
-				"contains": [],
+				"contains": [ "url" ],
 				"primary": true,
 				"required": true
 			}
@@ -177,7 +187,8 @@
         "output": [
           {
             "data_path": "action_result.data.*.operate_address.*.",
-            "data_type": "string"
+            "data_type": "string",
+			"contains": [ "url" ]
           },
           {
             "data_path": "action_result.summary.firewall",
@@ -191,18 +202,29 @@
         "versions":"EQ(*)"
       },
       {
-		"action" : "block application",
-		"description": "Block a network application",
+		"action" : "block service",
+		"description": "Block a network service",
 		"type" : "contain",
-		"identifier": "block_application",
+		"identifier": "block_service",
 		"read_only": true,
 		"parameters": {
-			"target": {
-				"description": "Application to be blocked",
+			"protocol": {
+				"description": "TCP or UDP",
 				"data_type": "string",
-				"contains": [],
 				"primary": true,
 				"required": true
+			},
+			"port": {
+				"description": "Service start port",
+				"data_type": "numeric",
+				"contains": [ "port" ],
+				"required": true
+			},
+			"port_end": {
+				"description": "Service end port. Leave blank if to block a single port number",
+				"data_type": "numeric",
+				"contains": [ "port" ],
+				"required": false
 			}
 		},
         "render": {
@@ -213,8 +235,18 @@
         },
         "output": [
           {
-            "data_path": "action_result.data.*.operate_address.*.",
+            "data_path": "action_result.data.*.protocol.*.",
             "data_type": "string"
+          },
+          {
+            "data_path": "action_result.data.*.port_start.*.",
+            "data_type": "numeric",
+			"contains": [ "port" ]
+          },
+          {
+            "data_path": "action_result.data.*.port_end.*.",
+            "data_type": "string",
+			"contains": [ "port" ]
           },
           {
             "data_path": "action_result.summary.firewall",
@@ -228,18 +260,29 @@
         "versions":"EQ(*)"
       },
       {
-		"action" : "unblock application",
-		"description": "Unblock a network application",
+		"action" : "unblock service",
+		"description": "Unblock a network service",
 		"type" : "correct",
-		"identifier": "unblock_application",
+		"identifier": "unblock_service",
 		"read_only": true,
 		"parameters": {
-			"target": {
-				"description": "Application to be unblocked",
+			"protocol": {
+				"description": "TCP or UDP",
 				"data_type": "string",
-				"contains": [],
 				"primary": true,
 				"required": true
+			},
+			"port": {
+				"description": "Service start port",
+				"data_type": "numeric",
+				"contains": [ "port" ],
+				"required": true
+			},
+			"port_end": {
+				"description": "Service end port. Leave blank if to block a single port number",
+				"data_type": "numeric",
+				"contains": [ "port" ],
+				"required": false
 			}
 		},
         "render": {
@@ -250,8 +293,18 @@
         },
         "output": [
           {
-            "data_path": "action_result.data.*.operate_address.*.",
+            "data_path": "action_result.data.*.protocol.*.",
             "data_type": "string"
+          },
+          {
+            "data_path": "action_result.data.*.port_start.*.",
+            "data_type": "numeric",
+			"contains": [ "port" ]
+          },
+          {
+            "data_path": "action_result.data.*.port_end.*.",
+            "data_type": "string",
+			"contains": [ "port" ]
           },
           {
             "data_path": "action_result.summary.firewall",
